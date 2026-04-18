@@ -169,6 +169,15 @@ Tarkus and Qhorus are siblings — neither depends on the other. Both depend on
 
 ---
 
+## Schema Convention
+
+**No existing installations** — there are no deployed instances of `quarkus-ledger` in production.
+All schema changes go directly into the base migration files (V1000–V1003) or into a new base
+migration file. Do NOT create incremental migration scripts to evolve the schema. Rewrite the
+relevant migration file in place. Treat every schema change as a clean-slate design decision.
+
+---
+
 ## Work Tracking
 
 **Issue tracking:** enabled
