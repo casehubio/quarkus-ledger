@@ -1,42 +1,50 @@
 # Quarkus Ledger — Session Handover
-**Date:** 2026-04-17
+**Date:** 2026-04-20
 
 ## Current State
 
-- **Tests:** 92 runtime + 12 order-processing + 3 art22 + 3 art12 = 110 total, all passing
-- **Open issues:** #11 (Merkle tree upgrade) — only open issue
+- **Tests:** 129 passing (runtime module), BUILD SUCCESS across all modules
+- **Open issues:** None — #11–#17 all closed
+- **quarkus-ledger installed to `~/.m2`** — Qhorus can consume immediately
 - **Version:** 1.0.0-SNAPSHOT
-- **Flyway:** V1000–V1003 base (V1000/V1002 now correctly committed to git)
 
 ## What Landed This Session
 
-**Research + compliance sprint (issues #7, #8, #9, #10 — all closed):**
-- LedgerSupplement architecture — 3 supplement types, supplements down to 2 this session
-- Forgiveness mechanism — two-parameter (recency × frequency), ADR 0001 written
-- EU AI Act Art.12 — retention job (archive-then-delete), 3 audit query methods
-- Causality query API — `causedByEntryId` + `correlationId` moved to `LedgerEntry` core; `ObservabilitySupplement` deleted; `findCausedBy(UUID)` SPI method
+**PROV-DM export (issues #13/#14 — closed):**
+- `LedgerProvSerializer.toProvJsonLd(UUID, List<LedgerEntry>)` — pure static, 13 unit tests
+- `LedgerProvExportService.exportSubject(UUID)` — CDI bean, 4 IT tests
+- `docs/prov-dm-mapping.md` — field-by-field reference for all supplements
+- `examples/prov-dm-export/` — 2 end-to-end tests covering all supplement types
 
-**Key architectural decision this session:**
-Core vs supplement test — "is this field relevant to every consumer, every entry, every time?" If yes → core. `correlationId` (OTel) and `causedByEntryId` (causality) both passed → moved to core → ObservabilitySupplement had no fields left → deleted.
+**Documentation review (issue #17 — closed):**
+- `integration-guide.md` + `examples.md` — removed deleted `LedgerHashChain` API (compile-breaking drift)
+- `DESIGN.md` — ObservabilitySupplement removed, PROV-DM section added, tracker updated
+- `CLAUDE.md` + `RESEARCH.md` — Merkle Mountain Range description, items #7/#8 marked done
+- Blog entries mdp03–mdp06 written and committed
 
-**Critical bug fixed:** V1000, V1001, V1002 Flyway SQL files were never committed to git. Now committed.
+**Reactive migration (issues #15/#16 — closed) — UNBLOCKS QHORUS:**
+- `LedgerEntry` is now a plain `@Entity` — no `PanacheEntityBase`. Qhorus can subclass reactively.
+- `JpaLedgerEntryRepository` — rewritten with `EntityManager` JPQL (Panache bytecode enhancement failed with plain entity)
+- `ReactiveLedgerEntryRepository` — SPI interface with `Uni<T>` return types. Qhorus implements it.
+- **Breaking API change:** `findById(UUID)` → `findEntryById(UUID)` in `LedgerEntryRepository` (return-type conflict with PanacheRepositoryBase)
 
-## Immediate Next Step
+**Key note for Qhorus:** `findById` is now `findEntryById`. Consumers need to update call sites.
 
-Start on **issue #11 — Merkle tree upgrade**.
+## Immediate Next Steps
 
-Brainstorming not yet done for #11. Begin with brainstorm → spec → plan → subagent-driven execution. The spec is at `docs/superpowers/specs/2026-04-17-causality-query-api-design.md` for reference on prior spec format.
+1. **LedgerMerkleFrontier decision** — still extends `PanacheEntityBase`. If it becomes a plain `@Entity` too, the reactive `save()` path could update the frontier properly (currently can't — frontier update uses blocking Panache statics). Discuss before Bayesian work.
 
-Issue #11 context: linear hash chain requires O(N) to verify any single entry. Merkle tree gives O(log N) inclusion proofs. Closes Axiom 4 (Verifiability). Architecture play before Quarkiverse submission. See `docs/RESEARCH.md` item #8 for research sources (RFC 9162, Russ Cox's transparent logs essay, Sunlight).
+2. **Bayesian trust weighting** — Research priority #6. Per-interaction recency weighting before EigenTrust eigen computation in `TrustScoreComputer`. Targeted algorithm change, no schema changes. Next after frontier decision.
+
+3. **Privacy/pseudonymisation (Axiom 7)** — hardest gap. Needs design before code.
 
 ## References
 
 | What | Path |
 |---|---|
 | Design doc | `docs/DESIGN.md` |
-| Auditability gap analysis (Axiom 4 still open) | `docs/AUDITABILITY.md` |
-| Research priority matrix | `docs/RESEARCH.md` |
-| Issue #11 | https://github.com/mdproctor/quarkus-ledger/issues/11 |
-| ADR 0001 (forgiveness severity exclusion) | `adr/0001-forgiveness-mechanism-omits-severity-dimension.md` |
-| Latest blog entry | `blog/2026-04-17-mdp02-two-fields-in-the-wrong-place.md` |
-| Supplement spec | `docs/superpowers/specs/2026-04-17-causality-query-api-design.md` |
+| Axiom gap analysis | `docs/AUDITABILITY.md` (6 of 8 ✅) |
+| PROV-DM mapping | `docs/prov-dm-mapping.md` |
+| ADRs | `adr/0001`, `adr/0002` |
+| Latest blog | `blog/2026-04-20-mdp06-a-clean-entity.md` |
+| PROV-DM spec | `docs/superpowers/specs/2026-04-18-prov-dm-export-design.md` |
