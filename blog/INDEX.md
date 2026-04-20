@@ -7,3 +7,4 @@
 | [2026-04-18-mdp03-from-on-to-olog-n.md](2026-04-18-mdp03-from-on-to-olog-n.md) | 2026-04-18 | Merkle Mountain Range replaces linear hash chain — stored frontier, Ed25519 publishing, RFC 9162 domain separation, code review catch |
 | [2026-04-18-mdp04-teaching-ledger-to-speak-w3c.md](2026-04-18-mdp04-teaching-ledger-to-speak-w3c.md) | 2026-04-18 | W3C PROV-DM JSON-LD export — mapping decisions, agent deduplication, wasDerivedFrom covering both chain and causality |
 | [2026-04-20-mdp05-catching-docs-before-consumer.md](2026-04-20-mdp05-catching-docs-before-consumer.md) | 2026-04-20 | Correction: LedgerHashChain API drift in integration guide and examples — compile-breaking references caught and fixed |
+| [2026-04-20-mdp06-a-clean-entity.md](2026-04-20-mdp06-a-clean-entity.md) | 2026-04-20 | LedgerEntry as plain @Entity for reactive subclassing — Panache bytecode gotcha, reactive dep trap, findEntryById rename |
