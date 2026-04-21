@@ -10,3 +10,4 @@
 | [2026-04-20-mdp06-a-clean-entity.md](2026-04-20-mdp06-a-clean-entity.md) | 2026-04-20 | LedgerEntry as plain @Entity for reactive subclassing — Panache bytecode gotcha, reactive dep trap, findEntryById rename |
 | [2026-04-20-mdp07-no-panache-in-the-model.md](2026-04-20-mdp07-no-panache-in-the-model.md) | 2026-04-20 | All internal entities converted to plain @Entity — library design rationale, @NamedQuery startup validation, JOINED inheritance delete gotcha |
 | [2026-04-21-mdp08-forgiveness-was-a-patch.md](2026-04-21-mdp08-forgiveness-was-a-patch.md) | 2026-04-21 | Bayesian Beta trust scoring + GDPR pseudonymisation SPI — two axiom gaps closed in one session |
+| [2026-04-21-mdp09-documentation-that-lies.md](2026-04-21-mdp09-documentation-that-lies.md) | 2026-04-21 | Capability applicability ratings, CAPABILITIES.md and PRIVACY.md added, systematic doc audit finds compile-breaking stale references |
