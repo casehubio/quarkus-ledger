@@ -1,50 +1,54 @@
 # Quarkus Ledger — Session Handover
-**Date:** 2026-04-20
+**Date:** 2026-04-21
 
 ## Current State
 
-- **Tests:** 129 passing (runtime module), BUILD SUCCESS across all modules
-- **Open issues:** None — #11–#17 all closed
+- **Tests:** 159 passing (runtime module), BUILD SUCCESS across all modules
+- **Open issues:** None — #28 (Bayesian Beta trust) and #29 (privacy pseudonymisation) both closed
 - **quarkus-ledger installed to `~/.m2`** — Qhorus can consume immediately
 - **Version:** 1.0.0-SNAPSHOT
 
 ## What Landed This Session
 
-**PROV-DM export (issues #13/#14 — closed):**
-- `LedgerProvSerializer.toProvJsonLd(UUID, List<LedgerEntry>)` — pure static, 13 unit tests
-- `LedgerProvExportService.exportSubject(UUID)` — CDI bean, 4 IT tests
-- `docs/prov-dm-mapping.md` — field-by-field reference for all supplements
-- `examples/prov-dm-export/` — 2 end-to-end tests covering all supplement types
+**Bayesian Beta trust scoring (issue #28 — closed):**
+- `TrustScoreComputer` — Beta accumulation: α/β per attestation with recency weighting, score=α/(α+β), prior Beta(1,1). `ForgivenessParams` and two-arg constructor removed entirely. See ADR 0003.
+- `ActorScore` record — gained `alpha`/`beta` fields, dropped `appealCount`
+- `ActorTrustScore` entity + V1001 schema — `alpha_value`/`beta_value` columns replace `appeal_count`
+- `TrustScoreJob`, `LedgerConfig` — ForgivenessConfig removed, single-arg constructor
+- 18 unit tests + 5 integration tests replacing forgiveness tests
 
-**Documentation review (issue #17 — closed):**
-- `integration-guide.md` + `examples.md` — removed deleted `LedgerHashChain` API (compile-breaking drift)
-- `DESIGN.md` — ObservabilitySupplement removed, PROV-DM section added, tracker updated
-- `CLAUDE.md` + `RESEARCH.md` — Merkle Mountain Range description, items #7/#8 marked done
-- Blog entries mdp03–mdp06 written and committed
+**Privacy / pseudonymisation (issue #29 — closed) — Axiom 7 addressed:**
+- `ActorIdentityProvider` SPI — `tokenise()`/`tokeniseForQuery()`/`resolve()`/`erase()`
+- `DecisionContextSanitiser` SPI — sanitise `decisionContext` JSON before persist
+- `InternalActorIdentityProvider` — built-in UUID token impl (plain Java, not CDI bean)
+- `LedgerPrivacyProducer` — `@Produces @DefaultBean @ApplicationScoped` pattern; custom bean silently replaces
+- `LedgerErasureService` — GDPR Art.17: finds token, counts affected entries, severs mapping, returns `ErasureResult`
+- `ActorIdentity` JPA entity + V1004 migration (`actor_identity` table)
+- `LedgerConfig.IdentityConfig` — `quarkus.ledger.identity.tokenisation.enabled` (default false)
+- Write path wired: `actorId` and `attestorId` tokenised on write; `decisionContext` sanitised; `findByActorId` translates via `tokeniseForQuery`
+- **Bug found + fixed:** `em.clear()` required after bulk JPQL `executeUpdate()` — Hibernate L1 cache returns stale entity otherwise
+- 31 new tests: unit, IT, end-to-end
 
-**Reactive migration (issues #15/#16 — closed) — UNBLOCKS QHORUS:**
-- `LedgerEntry` is now a plain `@Entity` — no `PanacheEntityBase`. Qhorus can subclass reactively.
-- `JpaLedgerEntryRepository` — rewritten with `EntityManager` JPQL (Panache bytecode enhancement failed with plain entity)
-- `ReactiveLedgerEntryRepository` — SPI interface with `Uni<T>` return types. Qhorus implements it.
-- **Breaking API change:** `findById(UUID)` → `findEntryById(UUID)` in `LedgerEntryRepository` (return-type conflict with PanacheRepositoryBase)
-
-**Key note for Qhorus:** `findById` is now `findEntryById`. Consumers need to update call sites.
+**Housekeeping:**
+- Closed stale issues #19, #20 (entity conversion — already landed)
+- RESEARCH.md — marked items 1–5 done (were still showing active); added items 9–11 (privacy, LLM mesh, EigenTrust transitivity)
+- Health check fix — `TrustScoreIT` datasource isolation (`trustscoretestdb`)
+- AUDITABILITY.md — Axiom 7 ✅. All 8 axioms now addressed.
 
 ## Immediate Next Steps
 
-1. **LedgerMerkleFrontier decision** — still extends `PanacheEntityBase`. If it becomes a plain `@Entity` too, the reactive `save()` path could update the frontier properly (currently can't — frontier update uses blocking Panache statics). Discuss before Bayesian work.
-
-2. **Bayesian trust weighting** — Research priority #6. Per-interaction recency weighting before EigenTrust eigen computation in `TrustScoreComputer`. Targeted algorithm change, no schema changes. Next after frontier decision.
-
-3. **Privacy/pseudonymisation (Axiom 7)** — hardest gap. Needs design before code.
+1. **Consumer guidance** — Axiom 7 addressed at extension level. Consumers must never store raw PII in `decisionContext` (or provide a `DecisionContextSanitiser` bean); confirm whether their `subjectId` is personal data.
+2. **LLM agent mesh (epic #22)** — parked. Start with #23 (agent identity model). Key insight: `actorId` should map to behavioral identity (CLAUDE.md + memory), not session ID.
+3. **EigenTrust transitivity (issue #26)** — research task before any code. Current model only computes direct attestation scores; true EigenTrust propagates trust through the mesh via eigenvector computation.
 
 ## References
 
 | What | Path |
 |---|---|
 | Design doc | `docs/DESIGN.md` |
-| Axiom gap analysis | `docs/AUDITABILITY.md` (6 of 8 ✅) |
-| PROV-DM mapping | `docs/prov-dm-mapping.md` |
-| ADRs | `adr/0001`, `adr/0002` |
-| Latest blog | `blog/2026-04-20-mdp06-a-clean-entity.md` |
-| PROV-DM spec | `docs/superpowers/specs/2026-04-18-prov-dm-export-design.md` |
+| Axiom gap analysis | `docs/AUDITABILITY.md` (all 8 ✅) |
+| RESEARCH.md | `docs/RESEARCH.md` (items 1–8 done, 9–11 active) |
+| ADRs | `adr/0001` (superseded), `adr/0002`, `adr/0003` (Bayesian Beta) |
+| Privacy spec | `docs/superpowers/specs/2026-04-21-privacy-pseudonymisation-design.md` |
+| Latest blog | `blog/2026-04-21-mdp08-forgiveness-was-a-patch.md` |
+| LLM agent mesh epic | GitHub #22 (child issues #23–#27) |
