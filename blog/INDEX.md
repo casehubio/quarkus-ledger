@@ -13,3 +13,4 @@
 | [2026-04-21-mdp09-documentation-that-lies.md](2026-04-21-mdp09-documentation-that-lies.md) | 2026-04-21 | Capability applicability ratings, CAPABILITIES.md and PRIVACY.md added, systematic doc audit finds compile-breaking stale references |
 | [2026-04-21-mdp10-when-the-paper-is-wrong.md](2026-04-21-mdp10-when-the-paper-is-wrong.md) | 2026-04-21 | EigenTrust implementation — hand-traced a convergence bug in the original paper, fixed with dangling-node treatment |
 | [2026-04-22-mdp11-trust-without-memory.md](2026-04-22-mdp11-trust-without-memory.md) | 2026-04-22 | LLM agent identity model — why versioned persona names, the clean break over inheritance, and the consumer-facing doc gap |
+| [2026-04-22-mdp12-trace-id-entity-listener-gap.md](2026-04-22-mdp12-trace-id-entity-listener-gap.md) | 2026-04-22 | correlationId renamed to traceId, OTel auto-wiring via CDI entity listener, and the integration test that should have been written first |
