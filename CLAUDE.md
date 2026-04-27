@@ -52,8 +52,8 @@ Domain logic is NOT in this extension — it lives in consumers via JPA JOINED s
 
 | Consumer | Subclass | Subclass table | subject_id maps to |
 |---|---|---|---|
-| `quarkus-tarkus` | `WorkItemLedgerEntry` | `work_item_ledger_entry` | WorkItem UUID |
-| `quarkus-qhorus` | `AgentMessageLedgerEntry` | `agent_message_ledger_entry` | Channel UUID |
+| `quarkus-work` | `WorkItemLedgerEntry` | `work_item_ledger_entry` | WorkItem UUID |
+| `quarkus-qhorus` | `MessageLedgerEntry` | `message_ledger_entry` | Channel UUID |
 
 Each consumer defines its own subclass and its own Flyway migration for the subclass table.
 The base tables (`ledger_entry`, `ledger_attestation`, `actor_trust_score`) are defined here
@@ -104,7 +104,7 @@ relevant to every consumer, every entry, every time? If yes → core. If no → 
 
 **All entities are plain `@Entity` — no Panache active-record base**
 No entity in the runtime module extends `PanacheEntityBase`. This allows reactive
-subclassing by consumers (e.g. Qhorus's `AgentMessageLedgerEntry`) and removes the
+subclassing by consumers (e.g. Qhorus's `MessageLedgerEntry`) and removes the
 forced `quarkus-hibernate-orm-panache` dep. Repositories use `EntityManager` + JPQL.
 Queries are declared as `@NamedQuery` on entity classes — Hibernate validates them at
 startup, so typos fail at boot not at query time.
@@ -220,7 +220,7 @@ JAVA_HOME=/Library/Java/JavaVirtualMachines/graalvm-25.jdk/Contents/Home
 ```
 quarkus-ledger       (audit/provenance — this project)
     ↑         ↑
- tarkus    qhorus    (each adds its own LedgerEntry subclass)
+ quarkus-work    quarkus-qhorus    (each adds its own LedgerEntry subclass)
     ↑         ↑
           claudony
 ```
