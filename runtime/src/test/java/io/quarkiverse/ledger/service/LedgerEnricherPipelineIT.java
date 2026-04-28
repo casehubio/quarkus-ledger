@@ -13,6 +13,11 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceState;
+import io.opentelemetry.context.Scope;
 import io.quarkiverse.ledger.runtime.model.ActorType;
 import io.quarkiverse.ledger.runtime.model.LedgerEntry;
 import io.quarkiverse.ledger.runtime.model.LedgerEntryType;
@@ -91,14 +96,17 @@ class LedgerEnricherPipelineIT {
     @Transactional
     void traceId_stillPopulated_despiteThrowingEnricher() {
         // TraceIdEnricher must still run even when ThrowingEnricher is registered.
-        // No active OTel span in this test, so traceId stays null — but the key point
-        // is no exception propagates.
+        // Provide an active OTel span so TraceIdEnricher has a real trace ID to populate.
         final TestEntry entry = buildEntry();
+        final SpanContext ctx = SpanContext.create(
+                "4bf92f3577b34da6a3ce929d0e0e4736", "00f067aa0ba902b7",
+                TraceFlags.getSampled(), TraceState.getDefault());
 
-        repo.save(entry);
+        try (Scope ignored = Span.wrap(ctx).makeCurrent()) {
+            repo.save(entry);
+        }
 
-        // Entry was saved — no exception means the pipeline completed gracefully
-        assertThat(repo.findEntryById(entry.id)).isPresent();
+        assertThat(entry.traceId).isEqualTo("4bf92f3577b34da6a3ce929d0e0e4736");
     }
 
     private static TestEntry buildEntry() {
