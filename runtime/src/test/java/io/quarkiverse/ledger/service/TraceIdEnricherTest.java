@@ -16,7 +16,7 @@ import io.quarkiverse.ledger.service.supplement.TestEntry;
 
 class TraceIdEnricherTest {
 
-    private static final String TRACE_ID = "abc123";
+    private static final String TRACE_ID = "4bf92f3577b34da6a3ce929d0e0e4736";
 
     private static TestEntry entry() {
         final TestEntry e = new TestEntry();
@@ -62,6 +62,6 @@ class TraceIdEnricherTest {
 
         enricher.enrich(entry);
 
-        assertThat(entry.traceId).isNull();
+        assertThat(entry.traceId).as("provider returned empty — traceId must remain null").isNull();
     }
 }
