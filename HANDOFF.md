@@ -23,16 +23,24 @@
 
 ## Open Issues from Cross-Repo Audit (#72)
 
-claudony and quarkus-work have real bugs found during Step 6 sweep — tracked in #72. Those repos have active in-progress work; fix in a dedicated session when clear:
+**claudony** — both bugs self-fixed by the claudony Claude session (confirmed via linter note):
+- ✅ Silent exception swallowing: `try/catch` removed, exceptions now propagate
+- ✅ `nextSequenceNumber()` race: replaced with JPQL query ordered by `sequenceNumber DESC`
 
-- **claudony `ClaudonyLedgerEventCapture`**: silent exception swallowing + `nextSequenceNumber()` race condition
-- **quarkus-work**: JSON built with `String.format()` (no escaping), missing null guard on `eventSuffix()`, 8 pre-existing `TrustScoreComputerTest` failures (wrong expectations)
+**quarkus-work** — still outstanding, prompts sent to that Claude session:
+- JSON built with `String.format()` in `buildDecisionContext()` — no escaping
+- Missing null guard on `eventSuffix()` return — NPE risk
+- 8 pre-existing `TrustScoreComputerTest` failures (expects `1.0`/`0.0`; Bayesian Beta gives `0.5`/`~0.333`)
+
+**quarkus-qhorus** — prompts sent: partial audit of `LedgerWriteService` (file truncated at line 140) + review audit
+
+**Recommended next action in this repo**: targeted code scan of recent quarkus-ledger commits for dismissed review findings — better than trying to reconstruct old session review output.
 
 ## Immediate Next Steps
 
 1. **Group B starts with #60** (add `capabilityTag` to `LedgerAttestation`) — then #61 (capability-scoped trust scores, requires #68 + #60) and #62 (multi-dimensional, requires #68)
-2. **Fix #72 findings** in claudony and quarkus-work when those sessions complete
-3. **Remaining Group A**: #56 (health checks), #57 (multi-attestation aggregation), #58 (compliance report — read consolidation check #6 first), #59 (ProvenanceSupplement enricher — requires #67 ✅)
+2. **Remaining Group A**: #56 (health checks), #57 (multi-attestation aggregation), #58 (compliance report — read consolidation check #6 first), #59 (ProvenanceSupplement enricher — requires #67 ✅)
+3. **Code scan**: scan recent quarkus-ledger commits for any Important findings that were dismissed — use `git log` + read the changed files directly (old session context is gone; direct code review is more reliable)
 
 ## References
 
