@@ -1,4 +1,4 @@
-# Quarkus Ledger — Claude Code Project Guide
+# CaseHub Ledger — Claude Code Project Guide
 
 ## Platform Context
 
@@ -13,7 +13,7 @@ https://raw.githubusercontent.com/casehubio/casehub-parent/main/docs/PLATFORM.md
 
 **This repo's deep-dive:**
 ```
-https://raw.githubusercontent.com/casehubio/casehub-parent/main/docs/repos/quarkus-ledger.md
+https://raw.githubusercontent.com/casehubio/casehub-parent/main/docs/repos/casehub-ledger.md
 ```
 
 **Other repo deep-dives** (fetch the relevant ones when your implementation touches their domain):
@@ -35,8 +35,8 @@ type: java
 
 ## What This Project Is
 
-`quarkus-ledger` is a standalone Quarkiverse extension providing a domain-agnostic immutable
-audit ledger for any Quarkus application. Any Quarkus app adds `io.quarkiverse.ledger:quarkus-ledger`
+`casehub-ledger` is a CaseHub extension providing a domain-agnostic immutable
+audit ledger for any Quarkus application. Any Quarkus app adds `io.casehub:casehub-ledger`
 as a dependency and immediately gets:
 
 - **Immutable append-only audit log** (`LedgerEntry` base entity with JPA JOINED inheritance)
@@ -57,22 +57,22 @@ Domain logic is NOT in this extension — it lives in consumers via JPA JOINED s
 
 Each consumer defines its own subclass and its own Flyway migration for the subclass table.
 The base tables (`ledger_entry`, `ledger_attestation`, `actor_trust_score`) are defined here
-in V1000–V1004 and always present when `quarkus-ledger` is on the classpath.
+in V1000–V1004 and always present when `casehub-ledger` is on the classpath.
 
 ---
 
-## Quarkiverse Naming
+## Maven Coordinates
 
 | Element | Value |
 |---|---|
-| GitHub repo | `casehubio/quarkus-ledger` (→ `quarkiverse/quarkus-ledger` when submitted) |
-| groupId | `io.quarkiverse.ledger` |
-| Parent artifactId | `quarkus-ledger-parent` |
-| Runtime artifactId | `quarkus-ledger` |
-| Deployment artifactId | `quarkus-ledger-deployment` |
-| Root Java package | `io.quarkiverse.ledger.runtime` |
-| Deployment subpackage | `io.quarkiverse.ledger.deployment` |
-| Config prefix | `quarkus.ledger` |
+| GitHub repo | `casehubio/ledger` |
+| groupId | `io.casehub` |
+| Parent artifactId | `casehub-ledger-parent` |
+| Runtime artifactId | `casehub-ledger` |
+| Deployment artifactId | `casehub-ledger-deployment` |
+| Root Java package | `io.casehub.ledger.runtime` |
+| Deployment subpackage | `io.casehub.ledger.deployment` |
+| Config prefix | `casehub.ledger` |
 | Feature name | `ledger` |
 
 ---
@@ -112,7 +112,7 @@ startup, so typos fail at boot not at query time.
 a Java return-type conflict with `PanacheRepositoryBase.findById()`.
 
 **REST endpoints are domain-specific**
-`quarkus-ledger` provides model, SPI, services, and JPA implementations only. Tarkus and
+`casehub-ledger` provides model, SPI, services, and JPA implementations only. Tarkus and
 Qhorus each define their own REST/MCP endpoints on top.
 
 **`actorId` format for LLM agents**
@@ -127,10 +127,10 @@ rationale.
 ## Project Structure
 
 ```
-quarkus-ledger/
+casehub-ledger/  (local folder: ~/claude/casehub/ledger)
 ├── runtime/
-│   └── src/main/java/io/quarkiverse/ledger/runtime/
-│       ├── config/LedgerConfig.java         — @ConfigMapping(prefix = "quarkus.ledger")
+│   └── src/main/java/io/casehub/ledger/runtime/
+│       ├── config/LedgerConfig.java         — @ConfigMapping(prefix = "casehub.ledger")
 │       ├── model/
 │       │   ├── LedgerEntry.java             — abstract base entity (JOINED inheritance)
 │       │   ├── LedgerAttestation.java       — peer attestation entity
@@ -185,7 +185,7 @@ quarkus-ledger/
 │       ├── V1003__ledger_entry_archive.sql  — ledger_entry_archive table
 │       └── V1004__actor_identity.sql        — actor_identity pseudonymisation table
 └── deployment/
-    └── src/main/java/io/quarkiverse/ledger/deployment/
+    └── src/main/java/io/casehub/ledger/deployment/
         └── LedgerProcessor.java             — @BuildStep: FeatureBuildItem
 ```
 
@@ -224,21 +224,21 @@ JAVA_HOME=/Library/Java/JavaVirtualMachines/graalvm-25.jdk/Contents/Home
 ## Ecosystem Context
 
 ```
-quarkus-ledger       (audit/provenance — this project)
+casehub-ledger       (audit/provenance — this project)
     ↑         ↑
  quarkus-work    quarkus-qhorus    (each adds its own LedgerEntry subclass)
     ↑         ↑
           claudony
 ```
 
-Tarkus and Qhorus are siblings — neither depends on the other. Both depend on
-`quarkus-ledger`. Claudony composes them.
+quarkus-work and quarkus-qhorus are siblings — neither depends on the other. Both depend on
+`casehub-ledger`. Claudony composes them.
 
 ---
 
 ## Schema Convention
 
-**No existing installations** — there are no deployed instances of `quarkus-ledger` in production.
+**No existing installations** — there are no deployed instances of `casehub-ledger` in production.
 All schema changes go directly into the base migration files (V1000–V1004) or into a new base
 migration file. Do NOT create incremental migration scripts to evolve the schema. Rewrite the
 relevant migration file in place. Treat every schema change as a clean-slate design decision.
@@ -248,7 +248,7 @@ relevant migration file in place. Treat every schema change as a clean-slate des
 ## Work Tracking
 
 **Issue tracking:** enabled
-**GitHub repo:** casehubio/quarkus-ledger
+**GitHub repo:** casehubio/ledger
 **Changelog:** GitHub Releases (run `gh release create --generate-notes` at milestones)
 
 **Automatic behaviours (Claude follows these at all times in this project):**
@@ -281,5 +281,4 @@ All casehubio projects align on these conventions:
 ```
 CI must use `server-id: github` + `GITHUB_TOKEN` in `actions/setup-java`.
 
-**Cross-project SNAPSHOT versions:** `quarkus-ledger` and `quarkus-work` modules are `0.2-SNAPSHOT` resolved from GitHub Packages. Declare in `pom.xml` properties and `<dependencyManagement>` — no hardcoded versions in submodule poms.
-
+**Cross-project SNAPSHOT versions:** `casehub-ledger` and `quarkus-work` modules are `0.2-SNAPSHOT` resolved from GitHub Packages. Declare in `pom.xml` properties and `<dependencyManagement>` — no hardcoded versions in submodule poms.
