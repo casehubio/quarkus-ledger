@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-order-processing</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: Order Processing</name>
+  <name>CaseHub Ledger - Example: Order Processing</name>
   <description>
     Runnable Quarkus application demonstrating casehub-ledger integration.
     Tracks an order lifecycle (place → ship → deliver / cancel) with immutable

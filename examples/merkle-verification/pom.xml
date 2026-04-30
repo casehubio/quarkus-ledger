@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-merkle-verification</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger :: Example :: Merkle Verification</name>
+  <name>CaseHub Ledger :: Example :: Merkle Verification</name>
   <description>
     A runnable Quarkus application demonstrating O(log N) Merkle inclusion proof
     generation and independent verification.

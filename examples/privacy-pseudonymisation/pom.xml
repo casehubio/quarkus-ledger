@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-privacy-pseudonymisation</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: Privacy and Pseudonymisation</name>
+  <name>CaseHub Ledger - Example: Privacy and Pseudonymisation</name>
   <description>
     Demonstrates the full GDPR privacy lifecycle: actor identity pseudonymisation (raw IDs
     replaced with UUID tokens), ComplianceSupplement detail and decisionContext fields,

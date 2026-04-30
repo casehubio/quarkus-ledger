@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-art22-decision-snapshot</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: GDPR Art.22 Decision Snapshot</name>
+  <name>CaseHub Ledger - Example: GDPR Art.22 Decision Snapshot</name>
   <description>
     A runnable Quarkus application demonstrating GDPR Article 22 compliant AI decision
     recording using ComplianceSupplement.

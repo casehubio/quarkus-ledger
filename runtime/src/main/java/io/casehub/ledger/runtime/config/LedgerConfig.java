@@ -6,7 +6,7 @@ import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 
 /**
- * Configuration for the Quarkus Ledger extension.
+ * Configuration for the CaseHub Ledger extension.
  *
  * <p>
  * All keys are under the {@code casehub.ledger} prefix. Every feature is independently

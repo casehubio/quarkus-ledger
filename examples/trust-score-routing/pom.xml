@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-trust-score-routing</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: Trust Score Routing</name>
+  <name>CaseHub Ledger - Example: Trust Score Routing</name>
   <description>
     Demonstrates trust score routing signals. Observes TrustScoreFullPayload (sync)
     and TrustScoreComputedAt (async) to maintain a ranked agent list for task assignment.

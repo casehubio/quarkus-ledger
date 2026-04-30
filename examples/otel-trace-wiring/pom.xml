@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-otel-trace-wiring</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: OTel Trace Wiring</name>
+  <name>CaseHub Ledger - Example: OTel Trace Wiring</name>
   <description>
     Demonstrates that LedgerEntry.traceId is automatically populated from the active
     OpenTelemetry span at persist time, via LedgerTraceListener. No call-site code

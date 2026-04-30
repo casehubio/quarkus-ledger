@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-art12-compliance</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: EU AI Act Art.12 Compliance</name>
+  <name>CaseHub Ledger - Example: EU AI Act Art.12 Compliance</name>
   <description>
     A runnable Quarkus application demonstrating EU AI Act Art.12 compliance —
     retention enforcement and auditor query API.

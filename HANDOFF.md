@@ -1,4 +1,4 @@
-# Quarkus Ledger — Session Handover
+# CaseHub Ledger — Session Handover
 **Date:** 2026-04-29
 
 ## Current State

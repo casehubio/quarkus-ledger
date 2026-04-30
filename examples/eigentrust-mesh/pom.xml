@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-eigentrust-mesh</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger - Example: EigenTrust Mesh</name>
+  <name>CaseHub Ledger - Example: EigenTrust Mesh</name>
   <description>
     Demonstrates EigenTrust transitive trust propagation in a multi-agent mesh.
     Multiple AI agents classify documents as LOW/MEDIUM/HIGH risk. Peer agents

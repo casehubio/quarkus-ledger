@@ -12,7 +12,7 @@
   <artifactId>casehub-ledger-example-prov-dm-export</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Quarkus Ledger :: Example :: PROV-DM Export</name>
+  <name>CaseHub Ledger :: Example :: PROV-DM Export</name>
   <description>
     A runnable Quarkus application demonstrating W3C PROV-DM JSON-LD export covering
     all supplement types: ComplianceSupplement, ProvenanceSupplement, and cross-subject causality.
