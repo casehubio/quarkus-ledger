@@ -1,54 +1,36 @@
 # CaseHub Ledger — Session Handover
-**Date:** 2026-04-29
+**Date:** 2026-04-30
 
 ## Current State
 
-`casehubio/ledger`, version `0.2-SNAPSHOT`. Clean working tree (`.claude/settings.local.json` modified locally — not a concern). SNAPSHOT installed and pushed to origin.
+`casehub-ledger` v0.2-SNAPSHOT. Clean working tree. All stale Quarkiverse/quarkus-ledger references purged across 60+ files — Java source, docs, blog, examples, SQL migrations, GitHub issues. IRI in serialized JSON-LD output corrected. Tier-4 health check passed with no High or Critical findings.
 
 ## What Landed This Session
 
-**Confidence & trust scoring fixes:**
-- `confidence` weighted in Bayesian Beta: `weight = recencyWeight × clamp(confidence, 0,1)`; `DEFAULT 1.0` on `ledger_attestation.confidence`; `overturnedCount` gated on `weight > 0` (Closes #69)
+**Naming cleanup (full sweep):**
+- IRI `http://quarkiverse.io/ledger#` → `https://casehubio.github.io/ledger#` in `LedgerProvSerializer.java`, its test, and `ProvDmExportIT.java` — this was live serialized output, not cosmetic
+- Stale names in Javadoc, docs, blog frontmatter, example pom `<name>` fields, SQL migration comments, historical plan docs, GitHub issues #48/#49/#72
+- Rule applied: change our old package/artifact names; leave actual Quarkiverse library deps untouched
 
-**Prerequisite refactors:**
-- #67: `LedgerEntryEnricher` SPI + `TraceIdEnricher` + `LedgerTraceListener` pipeline runner (Closes #67)
-- #68: `ActorTrustScore` discriminator model — UUID PK, `score_type` GLOBAL|CAPABILITY|DIMENSION, `scope_key` nullable, `UNIQUE NULLS NOT DISTINCT` (Closes #68)
+**CLAUDE.md updated:** `LedgerRetentionJob` and `RetentionEligibilityChecker` added to project structure table (were missing despite having integration tests)
 
-**Group A — all shipped:**
-- #55: `DecayFunction` SPI + `ExponentialDecayFunction` with valence multiplier (FLAGGED decays 0.5× slower, configurable); `TrustScoreComputer` delegates decay (Closes #55)
-- #54: `TrustGateService` CDI bean — `meetsThreshold(actorId, minTrust)`, capability overload Phase 1 falls back to global (Closes #54)
-- #53: `ActorTypeResolver.resolve()` in casehub-work, casehub-qhorus, casehub-engine, claudony — all local `deriveActorType()` removed (Closes #53)
+**Tier-4 health check:** architecture clean, BOM-managed throughout, DESIGN.md 100% accurate against code, 32 test classes covering all major services. DESIGN.md approaching single-file capacity — worth splitting before Group B lands (not urgent).
 
-**Process fix:** Important review findings now must reach the user or be fixed — never auto-dismissed by the controller (saved to memory).
+## Open Cross-Repo Issues (#72)
 
-## Open Issues from Cross-Repo Audit (#72)
-
-**claudony** — both bugs self-fixed by the claudony Claude session (confirmed via linter note):
-- ✅ Silent exception swallowing: `try/catch` removed, exceptions now propagate
-- ✅ `nextSequenceNumber()` race: replaced with JPQL query ordered by `sequenceNumber DESC`
-
-**casehub-work** — still outstanding, prompts sent to that Claude session:
-- JSON built with `String.format()` in `buildDecisionContext()` — no escaping
-- Missing null guard on `eventSuffix()` return — NPE risk
-- 8 pre-existing `TrustScoreComputerTest` failures (expects `1.0`/`0.0`; Bayesian Beta gives `0.5`/`~0.333`)
-
-**casehub-qhorus** — prompts sent: partial audit of `LedgerWriteService` (file truncated at line 140) + review audit
-
-**Recommended next action in this repo**: targeted code scan of recent casehub-ledger commits for dismissed review findings — better than trying to reconstruct old session review output.
+*Unchanged from previous handover — retrieve with: `git show HEAD~2:HANDOFF.md`*
 
 ## Immediate Next Steps
 
-1. **Group B starts with #60** (add `capabilityTag` to `LedgerAttestation`) — then #61 (capability-scoped trust scores, requires #68 + #60) and #62 (multi-dimensional, requires #68)
-2. **Remaining Group A**: #56 (health checks), #57 (multi-attestation aggregation), #58 (compliance report — read consolidation check #6 first), #59 (ProvenanceSupplement enricher — requires #67 ✅)
-3. **Code scan**: scan recent casehub-ledger commits for any Important findings that were dismissed — use `git log` + read the changed files directly (old session context is gone; direct code review is more reliable)
+1. **Group B starts with #60** — add `capabilityTag` to `LedgerAttestation`, then #61 (capability-scoped trust) and #62 (multi-dimensional)
+2. **Remaining Group A:** #56 (health checks), #57 (multi-attestation aggregation), #58 (compliance report), #59 (ProvenanceSupplement enricher)
+3. **DESIGN.md split** — before Group B adds more, consider `DESIGN-core.md` (entity model, SPI contracts) and `DESIGN-capabilities.md` (trust, Merkle, privacy, compliance)
 
 ## References
 
 | What | Path |
 |---|---|
-| Plan (Group A) | `docs/superpowers/plans/2026-04-28-group-a-55-54-53.md` |
-| Plan (Prerequisites) | `docs/superpowers/plans/2026-04-28-prerequisite-refactors-67-68.md` |
 | Latest ADRs | `adr/0005` – `adr/0007` |
 | Latest blog | `blog/2026-04-29-mdp01-what-the-reviews-missed.md` |
 | Cross-repo bugs | `https://github.com/casehubio/ledger/issues/72` |
-| casehub-parent | `~/casehub-parent/` |
+| Previous handover | `git show HEAD~1:HANDOFF.md` |
