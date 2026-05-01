@@ -1,36 +1,48 @@
 # CaseHub Ledger — Session Handover
-**Date:** 2026-04-30
+**Date:** 2026-05-01
 
 ## Current State
 
-`casehub-ledger` v0.2-SNAPSHOT. Clean working tree. All stale Quarkiverse/quarkus-ledger references purged across 60+ files — Java source, docs, blog, examples, SQL migrations, GitHub issues. IRI in serialized JSON-LD output corrected. Tier-4 health check passed with no High or Critical findings.
+`casehub-ledger` v0.2-SNAPSHOT. Clean working tree. 247 tests, BUILD SUCCESS.
+Group B has started — #60 (capabilityTag on LedgerAttestation) is shipped and
+closed. GitHub CI green.
 
 ## What Landed This Session
 
-**Naming cleanup (full sweep):**
-- IRI `http://quarkiverse.io/ledger#` → `https://casehubio.github.io/ledger#` in `LedgerProvSerializer.java`, its test, and `ProvDmExportIT.java` — this was live serialized output, not cosmetic
-- Stale names in Javadoc, docs, blog frontmatter, example pom `<name>` fields, SQL migration comments, historical plan docs, GitHub issues #48/#49/#72
-- Rule applied: change our old package/artifact names; leave actual Quarkiverse library deps untouched
+**DESIGN.md split:**
+- `docs/DESIGN.md` — stable structure (entity model, SPI, config, roadmap)
+- `docs/DESIGN-capabilities.md` — algorithms (Merkle, PROV-DM, trust capability
+  tags, agent identity, agent mesh)
 
-**CLAUDE.md updated:** `LedgerRetentionJob` and `RetentionEligibilityChecker` added to project structure table (were missing despite having integration tests)
+**#60 capabilityTag on LedgerAttestation (Group B, epic #50):**
+- `CapabilityTag.GLOBAL = "*"` sentinel (api module) — no NULL semantics
+- `capability_tag VARCHAR(255) NOT NULL DEFAULT '*'` in V1000
+- 3 new SPI methods (blocking + reactive parity): `findAttestationsByEntryIdAndCapabilityTag`,
+  `findAttestationsByEntryIdGlobal`, `findAttestationsByAttestorIdAndCapabilityTag`
+- JPA impl with `tokeniseForQuery` on attestorId
+- 9 IT + 3 unit tests; pseudonymisation-profile test in `LedgerPrivacyWiringIT`
+- Dead `api/repository/` package deleted (zero usages, silently diverging)
+- `LedgerTestFixtures.seedDecision` overload with capabilityTag (for B2)
+- qhorus#133 opened for deferred `LedgerWriteService` capabilityTag integration
 
-**Tier-4 health check:** architecture clean, BOM-managed throughout, DESIGN.md 100% accurate against code, 32 test classes covering all major services. DESIGN.md approaching single-file capacity — worth splitting before Group B lands (not urgent).
-
-## Open Cross-Repo Issues (#72)
-
-*Unchanged from previous handover — retrieve with: `git show HEAD~2:HANDOFF.md`*
+**Platform conventions (casehub/parent):**
+- `spi-blocking-reactive-parity.md` added — reflection test pattern for
+  blocking/reactive SPI parity enforcement
 
 ## Immediate Next Steps
 
-1. **Group B starts with #60** — add `capabilityTag` to `LedgerAttestation`, then #61 (capability-scoped trust) and #62 (multi-dimensional)
-2. **Remaining Group A:** #56 (health checks), #57 (multi-attestation aggregation), #58 (compliance report), #59 (ProvenanceSupplement enricher)
-3. **DESIGN.md split** — before Group B adds more, consider `DESIGN-core.md` (entity model, SPI contracts) and `DESIGN-capabilities.md` (trust, Merkle, privacy, compliance)
+1. **#61 (B2)** — capability-scoped trust scores: `TrustScoreJob` reads
+   `findAttestationsByAttestorIdAndCapabilityTag` and writes `CAPABILITY` rows
+   to `ActorTrustScore`
+2. **#62 (B3)** — multi-dimensional trust infrastructure
+3. **Group A remaining:** #56 (health checks), #57 (multi-attestation
+   aggregation), #58 (compliance report), #59 (ProvenanceSupplement enricher)
 
 ## References
 
 | What | Path |
 |---|---|
 | Latest ADRs | `adr/0005` – `adr/0007` |
-| Latest blog | `blog/2026-04-29-mdp01-what-the-reviews-missed.md` |
+| Latest blog | `blog/2026-05-01-mdp01-the-sentinel-this-time.md` |
 | Cross-repo bugs | `https://github.com/casehubio/ledger/issues/72` |
 | Previous handover | `git show HEAD~1:HANDOFF.md` |
